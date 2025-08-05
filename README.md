@@ -32,7 +32,7 @@ $ casper-client put-deploy --node-address http://localhost:11101 --chain-name ca
 $ casper-client get-deploy --node-address http://localhost:11101 $Session_hash
 ```
 
-execution_insfoの中の、"voter"という名前がついたkeyがContract Hashです。
+execution_infoの中の、"voter"という名前がついたkeyがContract Hashです。
 
 ![contract-hash](./image/contract-hash.png)
 
@@ -41,13 +41,13 @@ execution_insfoの中の、"voter"という名前がついたkeyがContract Hash
 --session-argで"ALICE"を指定し、ALICEの票数をインクリメントします。
 
 ```bash
-$ casper-client put-deploy --session-entry-point "voter_inc" --session-name "voter" --session-arg=candidate_name:"string='ALICE'" --payment-amount 500000000 --chain-name casper-net-1 --node-address http://localhost:11101 --secret-key /casper-nctl/assets/net-1/faucet/secret_key.pem
+$ casper-client put-deploy --session-entry-point "voter_inc" --session-name "voter" --session-arg=candidate_name:"string='ALICE'" --payment-amount 5000000000 --chain-name casper-net-1 --node-address http://localhost:11101 --secret-key /casper-nctl/assets/net-1/faucet/secret_key.pem
 ```
 
 ### 4. 上記のput-deployが成功したかを確認
 
 ```bash
-$ casper-client get-deploy --node-address http://localhost:11101 $Session_hash
+$ casper-client get-transaction $Session_hash --n http://localhost:11101 
 ```
 
 ### 5. State Root Hashの取得
