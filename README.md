@@ -63,6 +63,6 @@ $ casper-client get-state-root-hash --node-address http://localhost:11101 | jq -
 ALICEの票数がインクリメントされていることを確認します。
 
 ```bash
-$ casper-client query-state --node-address http://localhost:11101 -k <ContractHash> -s $STATE_ROOT_HASH -q "voter/ALICE" | jq -r
+$ casper-client query-state --node-address http://localhost:11101 -k <Publickey> -s $STATE_ROOT_HASH -q "voter/ALICE" | jq -r
 ```
 
