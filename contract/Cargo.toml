@@ -1,12 +1,13 @@
 [package]
 name = "voter-define"
-version = "0.1.0"
-edition = "2018"
-authors = ["Shogo Murakami <shogo.murakami@broadleaf.co.jp>"]
+version = "0.2.0"
+edition = "2021"
+resolver = "2"
 
 [dependencies]
-casper-contract = "=1.4.1"
-casper-types = "=1.4.1"
+casper-contract = "=5.1.1"
+casper-types = "6.0.1"
+base64ct = "<1.8.0"
 
 [[bin]]
 name = "voter-define"

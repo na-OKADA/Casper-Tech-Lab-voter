@@ -1,7 +1,5 @@
 #![no_std]
 #![no_main]
-#![allow(unused_parens)]
-#![allow(non_snake_case)]
 
 extern crate alloc;
 
@@ -10,14 +8,15 @@ use alloc::{
     string::String,
     vec,
 };
+
 use casper_contract::{
     contract_api::{runtime, storage},
     unwrap_or_revert::UnwrapOrRevert,
 };
+
 use casper_types::{
-    api_error::ApiError,
-    contracts::{EntryPoint, EntryPointAccess, EntryPointType, EntryPoints},
-    CLType, Key, URef, Parameter,
+    api_error::ApiError, CLType, Parameter, Key, NamedKeys,
+    EntryPointAccess, EntityEntryPoint as EntryPoint, EntryPoints, EntryPointType, EntryPointPayment,
 };
 
 const ALICE_KEY: &str = "ALICE";
@@ -26,50 +25,45 @@ const CHARLIE_KEY: &str = "CHARLIE";
 
 #[no_mangle]
 pub extern "C" fn voter_inc() {
-    // エントリーポイントから、candidate_nameを受け取る
     let candidate_name: String = runtime::get_named_arg("candidate_name");
-    
-    // candidate_nameのURefを取得
-    let uref: URef = runtime::get_key(&candidate_name)
-        .unwrap_or_revert_with(ApiError::MissingKey)
-        .into_uref()
+
+    let key = runtime::get_key(&candidate_name)
+        .unwrap_or_revert_with(ApiError::MissingKey);
+
+    let uref = key
+        .as_uref()
+        .cloned()
         .unwrap_or_revert_with(ApiError::UnexpectedKeyVariant);
-    
-    // URefのインクリメント
-    storage::add(uref, 1);
+
+    storage::add(uref, 1i32);
 }
 
 #[no_mangle]
 pub extern "C" fn call() {
-    // Named Keyの作成
-    let mut voter_named_keys: BTreeMap<String, Key> = BTreeMap::new();
+    let btree_map: BTreeMap<String, Key> = BTreeMap::new();
+    // Convert into NamedKeys
+    let mut named_keys: NamedKeys = btree_map.into();
 
-    let alice_key_name = String::from(ALICE_KEY);
-    let bob_key_name = String::from(BOB_KEY);
-    let charlie_key_name = String::from(CHARLIE_KEY);
+    let alice = storage::new_uref(0);
+    let bob = storage::new_uref(0);
+    let charlie = storage::new_uref(0);
 
-    // それぞれのlocal_keyを作成する必要があります。
-    let alice_local_key = storage::new_uref(0);
-    let bob_local_key = storage::new_uref(0);
-    let charlie_local_key = storage::new_uref(0);
+    named_keys.insert(ALICE_KEY.into(), alice.into());
+    named_keys.insert(BOB_KEY.into(), bob.into());
+    named_keys.insert(CHARLIE_KEY.into(), charlie.into());
 
-    // Named Keyの挿入
-    voter_named_keys.insert(alice_key_name, alice_local_key.into());
-    voter_named_keys.insert(bob_key_name, bob_local_key.into());
-    voter_named_keys.insert(charlie_key_name, charlie_local_key.into());
-
-    let mut voter_entry_points = EntryPoints::new();
-    voter_entry_points.add_entry_point(EntryPoint::new(
+    let mut entry_points = EntryPoints::new();
+    entry_points.add_entry_point(EntryPoint::new(
         "voter_inc",
-        vec![
-            Parameter::new("candidate_name", CLType::String),
-        ],
+        vec![Parameter::new("candidate_name", CLType::String)],
         CLType::Unit,
         EntryPointAccess::Public,
-        EntryPointType::Contract,
+        EntryPointType::Called,
+        EntryPointPayment::Caller,
     ));
 
     let (contract_hash, _) =
-        storage::new_locked_contract(voter_entry_points, Some(voter_named_keys), None, None);
+        storage::new_locked_contract(entry_points.into(), Some(named_keys), None, None, None);
+
     runtime::put_key("voter", contract_hash.into());
 }
