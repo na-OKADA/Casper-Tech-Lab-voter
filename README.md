@@ -21,7 +21,7 @@ NCTL(casper-net-1)にスマートコントラクトをデプロイし、動作�
 ### 1. スマートコントラクトのデプロイ
 
 ```bash
-$ casper-client put-deploy --node-address http://localhost:11101 --chain-name casper-net-1 --secret-key /casper-node/utils/nctl/assets/net-1/faucet/secret_key.pem --payment-amount 20000000000 --session-path /voter/target/wasm32-unknown-unknown/release/voter-define.wasm
+$ casper-client put-deploy --node-address http://localhost:11101 --chain-name casper-net-1 --secret-key /casper-nctl/assets/net-1/faucet/secret_key.pem --payment-amount 50000000000 --session-path /voter/target/wasm32-unknown-unknown/release/voter-define.wasm
 ```
 
 ### 2. スマートコントラクトのデプロイが成功したかを確認
@@ -29,10 +29,10 @@ $ casper-client put-deploy --node-address http://localhost:11101 --chain-name ca
 スマートコントラクトのデプロイが成功したかを確認し、後ほど使用するContract Hashを取得します。
 
 ```bash
-$ casper-client get-deploy --node-address http://localhost:11101 $DEPLOY_HASH
+$ casper-client get-deploy --node-address http://localhost:11101 $Session_hash
 ```
 
-execution_resultsの中の、"voter"という名前がついたkeyがContract Hashです。
+execution_insfoの中の、"voter"という名前がついたkeyがContract Hashです。
 
 ![contract-hash](./image/contract-hash.png)
 
@@ -40,16 +40,14 @@ execution_resultsの中の、"voter"という名前がついたkeyがContract Ha
 
 --session-argで"ALICE"を指定し、ALICEの票数をインクリメントします。
 
-Contract Hashは、--session-hash "hash-abcde1234" のように指定します。
-
 ```bash
-$ casper-client put-deploy --session-hash <ContractHash> --session-entry-point "voter_inc" --session-arg=candidate_name:"string='ALICE'" --payment-amount 20000000 --chain-name casper-net-1 --node-address http://localhost:11101 --secret-key /casper-node/utils/nctl/assets/net-1/faucet/secret_key.pem
+$ casper-client put-deploy --session-entry-point "voter_inc" --session-name "voter" --session-arg=candidate_name:"string='ALICE'" --payment-amount 500000000 --chain-name casper-net-1 --node-address http://localhost:11101 --secret-key /casper-nctl/assets/net-1/faucet/secret_key.pem
 ```
 
 ### 4. 上記のput-deployが成功したかを確認
 
 ```bash
-$ casper-client get-deploy --node-address http://localhost:11101 $DEPLOY_HASH
+$ casper-client get-deploy --node-address http://localhost:11101 $Session_hash
 ```
 
 ### 5. State Root Hashの取得
@@ -64,9 +62,7 @@ $ casper-client get-state-root-hash --node-address http://localhost:11101 | jq -
 
 ALICEの票数がインクリメントされていることを確認します。
 
-Contract Hashは、-k "hash-abcde1234" のように指定します。
-
 ```bash
-$ casper-client query-state --node-address http://localhost:11101 -k <ContractHash> -s $STATE_ROOT_HASH -q ALICE | jq -r
+$ casper-client query-state --node-address http://localhost:11101 -k <ContractHash> -s $STATE_ROOT_HASH -q "voter/ALICE" | jq -r
 ```
 
