@@ -21,7 +21,7 @@ NCTL(casper-net-1)にスマートコントラクトをデプロイし、動作�
 ### 1. スマートコントラクトのデプロイ
 
 ```bash
-$ casper-client put-deploy --node-address http://localhost:11101 --chain-name casper-net-1 --secret-key /casper-nctl/assets/net-1/faucet/secret_key.pem --payment-amount 50000000000 --session-path /voter/target/wasm32-unknown-unknown/release/voter-define.wasm
+$ casper-client put-transaction session --node-address http://localhost:11101 --chain-name casper-net-1 --secret-key /casper-nctl/assets/net-1/faucet/secret_key.pem --payment-amount 50000000000 --wasm-path /voter/target/wasm32-unknown-unknown/release/voter-define.wasm --gas-price-tolerance 10 --install-upgrade  --session-entry-point call --standard-payment true
 ```
 
 ### 2. スマートコントラクトのデプロイが成功したかを確認
@@ -29,7 +29,7 @@ $ casper-client put-deploy --node-address http://localhost:11101 --chain-name ca
 スマートコントラクトのデプロイが成功したかを確認し、後ほど使用するContract Hashを取得します。
 
 ```bash
-$ casper-client get-deploy --node-address http://localhost:11101 $Session_hash
+$ casper-client get-transaction $Session_hash --n http://localhost:11101
 ```
 
 execution_infoの中の、"voter"という名前がついたkeyがContract Hashです。
@@ -55,7 +55,7 @@ $ casper-client get-transaction $Session_hash --n http://localhost:11101
 後ほど必要となる、State Root Hashを取得します。
 
 ```bash
-$ casper-client get-state-root-hash --node-address http://localhost:11101 | jq -r
+$ casper-client get-state-root-hash --n http://localhost:11101
 ```
 
 ### 6. 票数がインクリメントされていることを確認
@@ -63,6 +63,6 @@ $ casper-client get-state-root-hash --node-address http://localhost:11101 | jq -
 ALICEの票数がインクリメントされていることを確認します。
 
 ```bash
-$ casper-client query-state --node-address http://localhost:11101 -k <Publickey> -s $STATE_ROOT_HASH -q "voter/ALICE" | jq -r
+$ casper-client query-state -n http://localhost:11101 -k <Publickey> -s $STATE_ROOT_HASH -q "voter/ALICE" | jq -r
 ```
 
