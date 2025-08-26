@@ -34,11 +34,7 @@ $ casper-client put-transaction session --node-address http://localhost:11101 --
 スマートコントラクトのデプロイが成功したかを確認し、後ほど使用するContract Hashを取得します。
 
 ```bash
-<<<<<<< HEAD
 casper-client get-transaction $TRANSACTION_HASH --n http://localhost:11101 
-=======
-$ casper-client get-transaction $Session_hash --n http://localhost:11101
->>>>>>> 9b9f1f256cc1449ca159dc985b803283cc5140de
 ```
 
 execution_infoの中の、"voter"という名前がついたkeyがContract Hashです。
