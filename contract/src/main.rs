@@ -63,7 +63,7 @@ pub extern "C" fn call() {
     ));
 
     let (contract_hash, _) =
-        storage::new_locked_contract(entry_points.into(), Some(named_keys), None, None, None);
+        storage::new_locked_contract(entry_points, Some(named_keys), None, None, None);
 
     runtime::put_key("voter", contract_hash.into());
 }

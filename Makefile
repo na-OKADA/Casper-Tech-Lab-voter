@@ -24,3 +24,5 @@ lint: clippy
 clean:
 	cargo clean
 	rm -rf tests/wasm/*.wasm
+
+all: prepare build-contract test lint
